@@ -1,5 +1,5 @@
 {
-  "name": "gpt-proxy",
+  "name": "jwt-base",
   "version": "0.1.0",
   "description": "Nestjs backend",
   "author": "Joaquín Soza",

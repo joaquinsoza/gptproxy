@@ -1,22 +1,10 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  GetCurrentUser,
-  GetCurrentUserId,
-  HasRoles,
-  Public,
-} from 'src/common/decorators';
-import { RolesGuard, RefreshTokenGuard } from 'src/common/guards';
-import { AuthService } from './auth.service';
-import { AuthLoginDto, AuthRegisterDto } from './dto';
-import { Tokens } from './types';
-import { Role } from '@prisma/client';
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common'
+import { GetCurrentUser, GetCurrentUserId, HasRoles, Public } from 'src/common/decorators'
+import { RolesGuard, RefreshTokenGuard } from 'src/common/guards'
+import { AuthService } from './auth.service'
+import { AuthLoginDto, AuthRegisterDto } from './dto'
+import { Tokens } from './types'
+import { Role } from '@prisma/client'
 
 @Controller('auth')
 export class AuthController {
@@ -31,8 +19,8 @@ export class AuthController {
   @UseGuards(RolesGuard)
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  register(@Body() dto: AuthRegisterDto): Promise<String> {
-    return this.authService.register(dto);
+  register(@Body() dto: AuthRegisterDto): Promise<string> {
+    return this.authService.register(dto)
   }
 
   /* We are saying to the main Guard system (JWT) 
@@ -41,7 +29,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   login(@Body() dto: AuthLoginDto): Promise<Tokens> {
-    return this.authService.login(dto);
+    return this.authService.login(dto)
   }
 
   /* This one is an example of a simple and protected endpoint any user 
@@ -50,7 +38,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@GetCurrentUserId() userId: number): Promise<boolean> {
-    return this.authService.logout(userId);
+    return this.authService.logout(userId)
   }
 
   /* This is an exception 
@@ -66,6 +54,6 @@ export class AuthController {
     @GetCurrentUserId() userId: number,
     @GetCurrentUser('refreshToken') refreshToken: string,
   ): Promise<Tokens> {
-    return this.authService.refreshTokens(userId, refreshToken);
+    return this.authService.refreshTokens(userId, refreshToken)
   }
 }

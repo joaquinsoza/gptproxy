@@ -4,13 +4,13 @@ import {
   HttpCode,
   HttpStatus,
   Injectable,
-} from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthLoginDto, AuthRegisterDto } from './dto';
-import * as bcrypt from 'bcrypt';
-import { JwtPayload, Tokens } from './types';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+} from '@nestjs/common'
+import { PrismaService } from 'src/prisma/prisma.service'
+import { AuthLoginDto, AuthRegisterDto } from './dto'
+import * as bcrypt from 'bcrypt'
+import { JwtPayload, Tokens } from './types'
+import { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class AuthService {
@@ -20,9 +20,9 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  async register(dto: AuthRegisterDto): Promise<String> {
+  async register(dto: AuthRegisterDto): Promise<string> {
     try {
-      const hash = await this.hashData(dto.password);
+      const hash = await this.hashData(dto.password)
 
       await this.prisma.user.create({
         data: {
@@ -30,11 +30,11 @@ export class AuthService {
           role: dto.role,
           hash,
         },
-      });
+      })
 
-      return 'New user registered';
+      return 'New user registered'
     } catch (error) {
-      throw new ConflictException('User already exists');
+      throw new ConflictException('User already exists')
     }
   }
 
@@ -43,17 +43,17 @@ export class AuthService {
       where: {
         email: dto.email,
       },
-    });
+    })
 
-    if (!user) throw new ForbiddenException('Access Denied');
-    if (!user.enabled) throw new ForbiddenException('Access Denied');
+    if (!user) throw new ForbiddenException('Access Denied')
+    if (!user.enabled) throw new ForbiddenException('Access Denied')
 
-    const passwordMatches = await bcrypt.compare(dto.password, user.hash);
-    if (!passwordMatches) throw new ForbiddenException('Access Denied');
+    const passwordMatches = await bcrypt.compare(dto.password, user.hash)
+    if (!passwordMatches) throw new ForbiddenException('Access Denied')
 
-    const tokens = await this.getTokens(user.id, user.email, user.role);
-    await this.updateRtHash(user.id, tokens.refresh_token);
-    return tokens;
+    const tokens = await this.getTokens(user.id, user.email, user.role)
+    await this.updateRtHash(user.id, tokens.refresh_token)
+    return tokens
   }
 
   async logout(userId: number) {
@@ -67,8 +67,8 @@ export class AuthService {
       data: {
         hashedRt: null,
       },
-    });
-    return true;
+    })
+    return true
   }
 
   async refreshTokens(userId: number, rt: string) {
@@ -76,20 +76,20 @@ export class AuthService {
       where: {
         id: userId,
       },
-    });
-    if (!user || !user.hashedRt) throw new ForbiddenException('Access Denied');
+    })
+    if (!user || !user.hashedRt) throw new ForbiddenException('Access Denied')
 
-    const rtMatches = await bcrypt.compare(rt, user.hashedRt);
-    if (!rtMatches) throw new ForbiddenException('Access Denied');
+    const rtMatches = await bcrypt.compare(rt, user.hashedRt)
+    if (!rtMatches) throw new ForbiddenException('Access Denied')
 
-    const tokens = await this.getTokens(user.id, user.email, user.role);
-    await this.updateRtHash(user.id, tokens.refresh_token);
+    const tokens = await this.getTokens(user.id, user.email, user.role)
+    await this.updateRtHash(user.id, tokens.refresh_token)
 
-    return tokens;
+    return tokens
   }
 
   async updateRtHash(userId: number, rt: string): Promise<void> {
-    const hash = await this.hashData(rt);
+    const hash = await this.hashData(rt)
     await this.prisma.user.update({
       where: {
         id: userId,
@@ -97,23 +97,19 @@ export class AuthService {
       data: {
         hashedRt: hash,
       },
-    });
+    })
   }
 
   hashData(data: string) {
-    return bcrypt.hash(data, 10);
+    return bcrypt.hash(data, 10)
   }
 
-  async getTokens(
-    userId: number,
-    email: string,
-    role: string,
-  ): Promise<Tokens> {
+  async getTokens(userId: number, email: string, role: string): Promise<Tokens> {
     const jwtPayload: JwtPayload = {
       sub: userId,
       email: email,
       role: role,
-    };
+    }
 
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
@@ -124,13 +120,13 @@ export class AuthService {
         secret: this.config.get<string>('RT_SECRET'),
         expiresIn: '7d',
       }),
-    ]);
+    ])
 
     return {
       username: email,
       role: role,
       access_token: at,
       refresh_token: rt,
-    };
+    }
   }
 }
