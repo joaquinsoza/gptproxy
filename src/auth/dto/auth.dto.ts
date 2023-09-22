@@ -1,10 +1,9 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator'
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator'
 import { Role } from '@prisma/client'
 
 export class AuthRegisterDto {
   @IsNotEmpty()
-  @IsEmail()
-  email: string
+  username: string
 
   @IsNotEmpty()
   @IsString()
@@ -17,8 +16,7 @@ export class AuthRegisterDto {
 
 export class AuthLoginDto {
   @IsNotEmpty()
-  @IsEmail()
-  email: string
+  username: string
 
   @IsNotEmpty()
   @IsString()

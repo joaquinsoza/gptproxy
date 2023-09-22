@@ -26,7 +26,7 @@ export class AuthService {
 
       await this.prisma.user.create({
         data: {
-          email: dto.email,
+          username: dto.username,
           role: dto.role,
           hash,
         },
@@ -41,7 +41,7 @@ export class AuthService {
   async login(dto: AuthLoginDto): Promise<Tokens> {
     const user = await this.prisma.user.findUnique({
       where: {
-        email: dto.email,
+        username: dto.username,
       },
     })
 
@@ -51,7 +51,7 @@ export class AuthService {
     const passwordMatches = await bcrypt.compare(dto.password, user.hash)
     if (!passwordMatches) throw new ForbiddenException('Access Denied')
 
-    const tokens = await this.getTokens(user.id, user.email, user.role)
+    const tokens = await this.getTokens(user.id, user.username, user.role)
     await this.updateRtHash(user.id, tokens.refresh_token)
     return tokens
   }
@@ -82,7 +82,7 @@ export class AuthService {
     const rtMatches = await bcrypt.compare(rt, user.hashedRt)
     if (!rtMatches) throw new ForbiddenException('Access Denied')
 
-    const tokens = await this.getTokens(user.id, user.email, user.role)
+    const tokens = await this.getTokens(user.id, user.username, user.role)
     await this.updateRtHash(user.id, tokens.refresh_token)
 
     return tokens
@@ -104,10 +104,10 @@ export class AuthService {
     return bcrypt.hash(data, 10)
   }
 
-  async getTokens(userId: number, email: string, role: string): Promise<Tokens> {
+  async getTokens(userId: number, username: string, role: string): Promise<Tokens> {
     const jwtPayload: JwtPayload = {
       sub: userId,
-      email: email,
+      username: username,
       role: role,
     }
 
@@ -123,7 +123,7 @@ export class AuthService {
     ])
 
     return {
-      username: email,
+      username: username,
       role: role,
       access_token: at,
       refresh_token: rt,
