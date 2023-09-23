@@ -13,10 +13,11 @@ export class AuthController {
   /* Sets roles for type of users 
   (To add more roles needs to update prisma user DB enum with roles) */
   @HasRoles(Role.ADMIN)
-  /* Sets the guard needed when using Roles 
+  /* Sets the guard needed when using Roles
   (This can be set at the top level where the @Controller is but 
   in this case we need them separately because of the public ones) */
   @UseGuards(RolesGuard)
+  // @Public()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   register(@Body() dto: AuthRegisterDto): Promise<string> {
