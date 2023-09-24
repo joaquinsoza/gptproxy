@@ -4,7 +4,7 @@ import configuration from './config/configuration'
 import { ChatgptModule } from './chatgpt/chatgpt.module'
 import { AuthModule } from './auth/auth.module'
 import { AuthMiddleware } from './middleware/auth/auth.middleware'
-import { AppController } from './APP.controller'
+import { AppController } from './app.controller'
 
 @Module({
   imports: [
