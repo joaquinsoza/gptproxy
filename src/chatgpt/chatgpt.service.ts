@@ -15,7 +15,6 @@ export class ChatgptService {
       messages: [{ role: 'system', content: prompt }],
     })
 
-    console.log(completion)
     return completion.choices[0]
   }
 
@@ -25,7 +24,6 @@ export class ChatgptService {
       messages: [{ role: 'system', content: prompt }],
     })
 
-    console.log(completion)
     return completion.choices[0]
   }
 }

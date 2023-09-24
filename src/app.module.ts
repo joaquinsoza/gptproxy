@@ -1,7 +1,10 @@
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import configuration from './config/configuration'
 import { ChatgptModule } from './chatgpt/chatgpt.module'
+import { AuthModule } from './auth/auth.module'
+import { AuthMiddleware } from './middleware/auth/auth.middleware'
+import { AppController } from './APP.controller'
 
 @Module({
   imports: [
@@ -10,7 +13,12 @@ import { ChatgptModule } from './chatgpt/chatgpt.module'
       isGlobal: true,
     }),
     ChatgptModule,
+    AuthModule,
   ],
-  controllers: [], // TO-DO: Add app.controller to show the health of the API (Just a @get endpoint that returns "Up and Runnning")
+  controllers: [AppController],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes('')
+  }
+}
