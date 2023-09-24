@@ -6,6 +6,8 @@ ENV NODE_ENV=production
 
 WORKDIR /workspace
 
+COPY . .
+
 RUN npm install
 RUN npm run build
 
