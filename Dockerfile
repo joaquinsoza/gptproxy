@@ -1,14 +1,21 @@
-FROM --platform=linux/amd64 node:18-slim
+# ---- Base Node ----
+FROM node:18 AS base
+WORKDIR /app
+COPY package*.json ./
 
-ENV PORT 3000
-ENV HOST 0.0.0.0
-ENV NODE_ENV=production
-
-WORKDIR /workspace
-
+# ---- Dependencies ----
+FROM base AS dependencies
+RUN npm install
 COPY . .
 
-RUN npm install
+# ---- Build ----
+FROM dependencies AS build
 RUN npm run build
 
+# ---- Release ----
+FROM node:18-alpine AS release
+WORKDIR /app
+COPY --from=dependencies /app/package*.json ./
+RUN npm install --only=production
+COPY --from=build /app/dist ./dist
 CMD ["npm", "run", "start:prod"]
